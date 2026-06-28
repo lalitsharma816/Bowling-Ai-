@@ -12,7 +12,7 @@ async function startCamera() {
 
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
-                facingMode: "environment"
+                facingMode: "user"
             },
             audio: false
         });
