@@ -20,7 +20,11 @@ video{
 }
 
 canvas{
-    display:none;
+    width:95%;
+    max-width:500px;
+    border:2px solid lime;
+    margin-top:15px;
+    }
 }
 
 #status{
