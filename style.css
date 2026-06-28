@@ -1,0 +1,30 @@
+body{
+    margin:0;
+    padding:20px;
+    background:#111;
+    color:white;
+    text-align:center;
+    font-family:Arial,sans-serif;
+}
+
+h1{
+    color:#00ff88;
+}
+
+video{
+    width:95%;
+    max-width:500px;
+    border:3px solid #00ff88;
+    border-radius:15px;
+    background:black;
+}
+
+canvas{
+    display:none;
+}
+
+#status{
+    color:yellow;
+    margin-top:20px;
+    font-size:22px;
+}
