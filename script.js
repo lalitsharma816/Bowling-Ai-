@@ -5,52 +5,54 @@ const video = document.getElementById("video");
 const status = document.getElementById("status");
 
 
-let previousY = null;
+let previousWristY = null;
 let cooldown = false;
 
 
 
 async function startCamera(){
 
-    try{
+try{
 
-        const stream = await navigator.mediaDevices.getUserMedia({
+const stream = await navigator.mediaDevices.getUserMedia({
 
-            video:{
-                facingMode:"user"
-            },
+video:{
+facingMode:"user"
+},
 
-            audio:false
+audio:false
 
-        });
-
-
-        video.srcObject = stream;
-
-        status.innerHTML="📷 Camera Started";
+});
 
 
-    }
-    catch(error){
+video.srcObject = stream;
 
-        console.log(error);
+status.innerHTML="📷 Camera Started";
 
-        status.innerHTML="❌ Camera Error";
 
-    }
+}
+
+catch(error){
+
+console.log(error);
+
+status.innerHTML="❌ Camera Error";
+
+}
 
 }
 
 
 
 
+
 const pose = new Pose({
 
-    locateFile:(file)=>{
+locateFile:(file)=>{
 
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
 
-    }
+}
 
 });
 
@@ -59,15 +61,16 @@ const pose = new Pose({
 
 pose.setOptions({
 
-    modelComplexity:1,
+modelComplexity:1,
 
-    smoothLandmarks:true,
+smoothLandmarks:true,
 
-    minDetectionConfidence:0.5,
+minDetectionConfidence:0.6,
 
-    minTrackingConfidence:0.5
+minTrackingConfidence:0.6
 
 });
+
 
 
 
@@ -79,76 +82,87 @@ pose.onResults((results)=>{
 if(results.poseLandmarks){
 
 
-    let wrist = results.poseLandmarks[16];
+let wrist = results.poseLandmarks[16];
 
-
-    if(wrist){
-
-
-        let movement = 0;
+let elbow = results.poseLandmarks[14];
 
 
 
-        if(previousY !== null){
-
-
-            movement = wrist.y - previousY;
+if(wrist && elbow){
 
 
 
-            // Bowling downward movement
-
-            if(movement > 0.04 && !cooldown){
-
-
-                status.innerHTML="💥 BALL RELEASE!";
-
-
-                cooldown=true;
-
-
-                // Send signal to 3D game
-
-                if(window.releaseBall){
-
-                    window.releaseBall();
-
-                }
+let wristMove = 0;
 
 
 
-                setTimeout(()=>{
-
-                    cooldown=false;
-
-                },1000);
+if(previousWristY !== null){
 
 
 
-            }
+wristMove = wrist.y - previousWristY;
 
-            else{
-
-
-                status.innerHTML="✋ Hand Tracking";
-
-
-            }
-
-
-
-        }
-
-
-        previousY=wrist.y;
-
-
-    }
 
 
 }
 
+
+
+// Wrist should move down fast
+
+if(
+wristMove > 0.08 &&
+elbow.y < wrist.y &&
+!cooldown
+){
+
+
+status.innerHTML="🔥 REAL BOWLING RELEASE";
+
+
+cooldown=true;
+
+
+
+if(window.releaseBall){
+
+window.releaseBall();
+
+}
+
+
+
+setTimeout(()=>{
+
+cooldown=false;
+
+},1500);
+
+
+
+}
+
+else{
+
+
+status.innerHTML="✋ Waiting Bowling";
+
+}
+
+
+
+previousWristY=wrist.y;
+
+
+
+}
+
+
+}
+
+
 });
+
 
 
 
@@ -172,7 +186,6 @@ requestAnimationFrame(detect);
 
 
 }
-
 
 
 detect();
