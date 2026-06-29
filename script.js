@@ -78,10 +78,7 @@ pose.onResults((results)=>{
 
             if(!bowling){
 
-                status.innerHTML =
-                "🏏 Right Wrist X=" + x +
-                " Y=" + y +
-                " Move=" + movement.toFixed(3);
+                status.innerHTML = "🟢 AI Body Detected";
 
             }
 
