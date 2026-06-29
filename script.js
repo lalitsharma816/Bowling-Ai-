@@ -1,6 +1,8 @@
 const video = document.getElementById("video");
 const status = document.getElementById("status");
-
+let previousY = null;
+let bowling = false;
+let release = false;
 async function startCamera() {
 
     try {
