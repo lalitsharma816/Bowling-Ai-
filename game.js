@@ -84,7 +84,15 @@ camera.position.set(0,5,12);
 camera.lookAt(0,0,-5);
 
 function animate(){
+function animate(){
 
+requestAnimationFrame(animate);
+
+moveBall();
+
+renderer.render(scene,camera);
+
+}
 requestAnimationFrame(animate);
 
 renderer.render(scene,camera);
