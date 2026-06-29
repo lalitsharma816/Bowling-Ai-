@@ -53,7 +53,7 @@ pose.onResults((results)=>{
         let wrist = results.poseLandmarks[16];
 
         if(wrist){
-
+let y = wrist.y;
             let x = Math.round(wrist.x * 100);
             let y = Math.round(wrist.y * 100);
 
