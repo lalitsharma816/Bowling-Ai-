@@ -8,22 +8,30 @@ scene.background = new THREE.Color(0x87ceeb);
 
 
 const camera = new THREE.PerspectiveCamera(
+
 75,
+
 window.innerWidth / 400,
+
 0.1,
+
 1000
+
 );
 
 
 
 const renderer = new THREE.WebGLRenderer({
+
 antialias:true
+
 });
 
 
 renderer.setSize(window.innerWidth,400);
 
 document.body.appendChild(renderer.domElement);
+
 
 
 
@@ -35,13 +43,15 @@ const ground = new THREE.Mesh(
 new THREE.PlaneGeometry(20,40),
 
 new THREE.MeshPhongMaterial({
+
 color:0x228b22
+
 })
 
 );
 
 
-ground.rotation.x = -Math.PI/2;
+ground.rotation.x=-Math.PI/2;
 
 scene.add(ground);
 
@@ -56,7 +66,9 @@ const pitch = new THREE.Mesh(
 new THREE.BoxGeometry(2,0.05,16),
 
 new THREE.MeshPhongMaterial({
+
 color:0xd2b48c
+
 })
 
 );
@@ -70,6 +82,7 @@ scene.add(pitch);
 
 
 
+
 // Ball
 
 const ball = new THREE.Mesh(
@@ -77,7 +90,9 @@ const ball = new THREE.Mesh(
 new THREE.SphereGeometry(0.15,32,32),
 
 new THREE.MeshPhongMaterial({
+
 color:0x8b0000
+
 })
 
 );
@@ -93,16 +108,15 @@ scene.add(ball);
 
 let ballMoving=false;
 
-let speed=0.18;
-
 let startTime=0;
 
+let ballSpeed=0.18;
 
 
 
 
 
-// Wickets
+// Stumps
 
 const stumps=[];
 
@@ -110,21 +124,40 @@ const stumps=[];
 for(let i=-0.15;i<=0.15;i+=0.15){
 
 
-const stump=new THREE.Mesh(
+const stump = new THREE.Mesh(
 
-new THREE.CylinderGeometry(0.03,0.03,1),
+new THREE.CylinderGeometry(
+
+0.03,
+
+0.03,
+
+1
+
+),
 
 new THREE.MeshPhongMaterial({
+
 color:0xffffff
+
 })
 
 );
 
 
-stump.position.set(i,0.5,-7);
+stump.position.set(
+
+i,
+
+0.5,
+
+-7
+
+);
 
 
 scene.add(stump);
+
 
 stumps.push(stump);
 
@@ -136,22 +169,34 @@ stumps.push(stump);
 
 
 
-// AI se ball release
+
+
+// AI release signal
 
 window.releaseBall=function(){
+
 
 
 if(!ballMoving){
 
 
-ball.position.z=5;
+ball.position.set(0,1,5);
+
 
 ballMoving=true;
+
 
 startTime=Date.now();
 
 
+
+document.getElementById("status").innerHTML =
+"🏏 Bowling...";
+
+
 }
+
+
 
 };
 
@@ -160,7 +205,6 @@ startTime=Date.now();
 
 
 
-// Wicket check
 
 function checkWicket(){
 
@@ -168,22 +212,36 @@ function checkWicket(){
 for(let stump of stumps){
 
 
-let distance =
-ball.position.distanceTo(stump.position);
+let distance = ball.position.distanceTo(
+
+stump.position
+
+);
 
 
 
 if(distance < 0.35){
 
 
+
 ballMoving=false;
 
 
+
 document.getElementById("status").innerHTML =
-"🏏 OUT! WICKET HIT";
+
+"🎯 OUT! WICKET HIT";
 
 
-return true;
+
+addWicket();
+
+
+
+return;
+
+
+}
 
 
 }
@@ -192,18 +250,11 @@ return true;
 }
 
 
-return false;
-
-
-}
 
 
 
 
 
-
-
-// Ball movement
 
 function moveBall(){
 
@@ -211,33 +262,35 @@ function moveBall(){
 if(ballMoving){
 
 
-ball.position.z -= speed;
-  document.getElementById("status").innerHTML =
-"Ball Z = " + ball.position.z.toFixed(2);
+ball.position.z -= ballSpeed;
 
 
 
-if(checkWicket()){
-
-return;
-
-}
-
+checkWicket();
 
 
 
 if(ball.position.z < -8){
 
 
-let time=(Date.now()-startTime)/1000;
+
+let time =
+(Date.now()-startTime)/1000;
 
 
-let ballSpeed=(16/time).toFixed(1);
+
+let speed =
+(16/time).toFixed(1);
 
 
 
 document.getElementById("status").innerHTML =
-"⚡ Speed: "+ballSpeed+" m/s";
+
+"⚡ Speed: "+speed+" km/h";
+
+
+
+addBall();
 
 
 
@@ -246,9 +299,6 @@ ball.position.z=5;
 ballMoving=false;
 
 
-}
-
-
 
 }
 
@@ -257,27 +307,41 @@ ballMoving=false;
 
 
 
+}
 
 
 
 
 
-// Lights
 
-const light=new THREE.DirectionalLight(
+
+
+// Light
+
+const light = new THREE.DirectionalLight(
+
 0xffffff,
+
 1
+
 );
 
 
 light.position.set(5,10,5);
 
-
 scene.add(light);
 
 
 scene.add(
-new THREE.AmbientLight(0xffffff,0.5)
+
+new THREE.AmbientLight(
+
+0xffffff,
+
+0.5
+
+)
+
 );
 
 
@@ -285,11 +349,26 @@ new THREE.AmbientLight(0xffffff,0.5)
 
 
 
+camera.position.set(
 
-camera.position.set(0,5,12);
+0,
+
+5,
+
+12
+
+);
 
 
-camera.lookAt(0,0,-5);
+camera.lookAt(
+
+0,
+
+0,
+
+-5
+
+);
 
 
 
