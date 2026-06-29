@@ -1,133 +1,44 @@
-import * as THREE from "three";
+alert("AI Bowling Loaded");
 
 
-const scene = new THREE.Scene();
-
-scene.background = new THREE.Color(0x87ceeb);
-
+const video = document.getElementById("video");
+const status = document.getElementById("status");
 
 
-const camera = new THREE.PerspectiveCamera(
-75,
-window.innerWidth / 400,
-0.1,
-1000
-);
+let previousWristY = null;
+let cooldown = false;
 
 
 
-const renderer = new THREE.WebGLRenderer({
-antialias:true
+async function startCamera(){
+
+try{
+
+const stream = await navigator.mediaDevices.getUserMedia({
+
+video:{
+facingMode:"user"
+},
+
+audio:false
+
 });
 
 
-renderer.setSize(window.innerWidth,400);
+video.srcObject = stream;
 
-document.body.appendChild(renderer.domElement);
-
-
+status.innerHTML="📷 Camera Started";
 
 
-// Ground
+}
 
-const ground = new THREE.Mesh(
+catch(error){
 
-new THREE.PlaneGeometry(20,40),
+console.log(error);
 
-new THREE.MeshPhongMaterial({
-color:0x228b22
-})
+status.innerHTML="❌ Camera Error";
 
-);
-
-
-ground.rotation.x = -Math.PI/2;
-
-scene.add(ground);
-
-
-
-
-
-// Pitch
-
-const pitch = new THREE.Mesh(
-
-new THREE.BoxGeometry(2,0.05,16),
-
-new THREE.MeshPhongMaterial({
-color:0xd2b48c
-})
-
-);
-
-
-pitch.position.y=0.03;
-
-scene.add(pitch);
-
-
-
-
-
-// Ball
-
-const ball = new THREE.Mesh(
-
-new THREE.SphereGeometry(0.15,32,32),
-
-new THREE.MeshPhongMaterial({
-color:0x8b0000
-})
-
-);
-
-
-ball.position.set(0,1,5);
-
-scene.add(ball);
-
-
-
-
-
-let ballMoving=false;
-
-let speed=0.18;
-
-let startTime=0;
-
-
-
-
-
-
-// Wickets
-
-const stumps=[];
-
-
-for(let i=-0.15;i<=0.15;i+=0.15){
-
-
-const stump=new THREE.Mesh(
-
-new THREE.CylinderGeometry(0.03,0.03,1),
-
-new THREE.MeshPhongMaterial({
-color:0xffffff
-})
-
-);
-
-
-stump.position.set(i,0.5,-7);
-
-
-scene.add(stump);
-
-stumps.push(stump);
-
+}
 
 }
 
@@ -135,118 +46,112 @@ stumps.push(stump);
 
 
 
+const pose = new Pose({
 
-// AI se ball release
+locateFile:(file)=>{
 
-window.releaseBall=function(){
-
-
-if(!ballMoving){
-
-
-ball.position.z=5;
-
-ballMoving=true;
-
-startTime=Date.now();
-
+return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
 
 }
 
-};
+});
+
+
+
+
+pose.setOptions({
+
+modelComplexity:1,
+
+smoothLandmarks:true,
+
+minDetectionConfidence:0.6,
+
+minTrackingConfidence:0.6
+
+});
 
 
 
 
 
 
-// Wicket check
-
-function checkWicket(){
+pose.onResults((results)=>{
 
 
-for(let stump of stumps){
+if(results.poseLandmarks){
 
 
-let distance =
-ball.position.distanceTo(stump.position);
+let wrist = results.poseLandmarks[16];
 
-
-
-if(distance < 0.35){
-
-
-ballMoving=false;
-
-
-document.getElementById("status").innerHTML =
-"🏏 OUT! WICKET HIT";
-
-
-return true;
-
-
-}
-
-
-}
-
-
-return false;
-
-
-}
+let elbow = results.poseLandmarks[14];
 
 
 
+if(wrist && elbow){
 
 
 
-
-// Ball movement
-
-function moveBall(){
-
-
-if(ballMoving){
-
-
-ball.position.z -= speed;
-  document.getElementById("status").innerHTML =
-"Ball Z = " + ball.position.z.toFixed(2);
+let wristMove = 0;
 
 
 
-if(checkWicket()){
+if(previousWristY !== null){
 
-return;
+
+
+wristMove = wrist.y - previousWristY;
+
+
 
 }
 
 
 
+// Wrist should move down fast
 
-if(ball.position.z < -8){
-
-
-let time=(Date.now()-startTime)/1000;
-
-
-let ballSpeed=(16/time).toFixed(1);
-
+if(
+wristMove > 0.08 &&
+elbow.y < wrist.y &&
+!cooldown
+){
 
 
-document.getElementById("status").innerHTML =
-"⚡ Speed: "+ballSpeed+" m/s";
+status.innerHTML="🔥 REAL BOWLING RELEASE";
+
+
+cooldown=true;
 
 
 
-ball.position.z=5;
+if(window.releaseBall){
 
-ballMoving=false;
+window.releaseBall();
+
+}
+
+
+
+setTimeout(()=>{
+
+cooldown=false;
+
+},1500);
+
 
 
 }
+
+else{
+
+
+status.innerHTML="✋ Waiting Bowling";
+
+}
+
+
+
+previousWristY=wrist.y;
 
 
 
@@ -256,29 +161,7 @@ ballMoving=false;
 }
 
 
-
-
-
-
-
-
-// Lights
-
-const light=new THREE.DirectionalLight(
-0xffffff,
-1
-);
-
-
-light.position.set(5,10,5);
-
-
-scene.add(light);
-
-
-scene.add(
-new THREE.AmbientLight(0xffffff,0.5)
-);
+});
 
 
 
@@ -286,30 +169,32 @@ new THREE.AmbientLight(0xffffff,0.5)
 
 
 
-camera.position.set(0,5,12);
+video.addEventListener("loadeddata",()=>{
 
 
-camera.lookAt(0,0,-5);
+async function detect(){
 
 
+await pose.send({
+
+image:video
+
+});
 
 
-
-
-
-function animate(){
-
-
-requestAnimationFrame(animate);
-
-
-moveBall();
-
-
-renderer.render(scene,camera);
+requestAnimationFrame(detect);
 
 
 }
 
 
-animate();
+detect();
+
+
+});
+
+
+
+
+
+startCamera();
