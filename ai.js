@@ -1,117 +1,78 @@
 let lastWristY = null;
 let releaseLock = false;
 
-let stableFrames = 0;
-
 
 function analyzeBowling(results){
 
+    if(!results.poseLandmarks){
+        return;
+    }
 
-if(!results.poseLandmarks){
-    return;
-}
 
+    let wrist = results.poseLandmarks[16];
 
 
-let wrist = results.poseLandmarks[16];
-let elbow = results.poseLandmarks[14];
-let shoulder = results.poseLandmarks[12];
+    if(!wrist){
+        return;
+    }
 
 
 
-if(!wrist || !elbow || !shoulder){
-    return;
-}
+    let movement = 0;
 
 
 
+    if(lastWristY !== null){
 
-let movement = 0;
+        movement = wrist.y - lastWristY;
 
+    }
 
-if(lastWristY !== null){
 
-    movement = wrist.y - lastWristY;
 
-}
+    lastWristY = wrist.y;
 
 
-lastWristY = wrist.y;
 
+    // Debug
 
+    document.getElementById("status").innerHTML =
+    "Movement: " + movement.toFixed(3);
 
-// Debug
 
-document.getElementById("status").innerHTML =
-"Wrist move: " + movement.toFixed(3);
 
 
+    if(
+        movement > 0.05 &&
+        !releaseLock
+    ){
 
 
-// Very strict release
+        releaseLock = true;
 
-if(
 
-movement > 0.18 &&
+        document.getElementById("status").innerHTML =
+        "🔥 BALL RELEASE";
 
-wrist.y > elbow.y &&
 
-elbow.y > shoulder.y &&
 
-!releaseLock
+        if(window.releaseBall){
 
-){
+            window.releaseBall();
 
+        }
 
-stableFrames++;
 
 
-}
+        setTimeout(()=>{
 
-else{
+            releaseLock=false;
 
+        },1500);
 
-stableFrames = 0;
 
 
-}
-
-
-
-
-
-// 3 frames same condition required
-
-if(stableFrames >= 3){
-
-
-releaseLock=true;
-
-
-document.getElementById("status").innerHTML =
-"🔥 BALL RELEASE";
-
-
-
-if(window.releaseBall){
-
-window.releaseBall();
-
-}
-
-
-
-setTimeout(()=>{
-
-releaseLock=false;
-
-stableFrames=0;
-
-},2500);
-
-
-
-}
+    }
 
 
 }
