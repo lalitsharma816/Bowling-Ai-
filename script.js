@@ -1,4 +1,4 @@
-alert("JavaScript Loaded");
+alert("AI Bowling Loaded");
 
 
 const video = document.getElementById("video");
@@ -6,65 +6,66 @@ const status = document.getElementById("status");
 
 
 let previousY = null;
-let bowling = false;
+let cooldown = false;
 
 
 
 async function startCamera(){
 
-try{
+    try{
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+
+            video:{
+                facingMode:"user"
+            },
+
+            audio:false
+
+        });
 
 
-const stream = await navigator.mediaDevices.getUserMedia({
+        video.srcObject = stream;
 
-video:{
-facingMode:"user"
-},
-
-audio:false
-
-});
+        status.innerHTML="📷 Camera Started";
 
 
-video.srcObject = stream;
+    }
+    catch(error){
 
+        console.log(error);
 
-status.innerHTML="📷 Camera Started";
+        status.innerHTML="❌ Camera Error";
 
-
-}
-
-catch(error){
-
-console.log(error);
-
-status.innerHTML="❌ Camera Error";
-
-}
-
+    }
 
 }
+
 
 
 
 const pose = new Pose({
 
-locateFile:(file)=>{
+    locateFile:(file)=>{
 
-return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
 
-}
+    }
 
 });
 
 
 
+
 pose.setOptions({
 
-modelComplexity:1,
-smoothLandmarks:true,
-minDetectionConfidence:0.5,
-minTrackingConfidence:0.5
+    modelComplexity:1,
+
+    smoothLandmarks:true,
+
+    minDetectionConfidence:0.5,
+
+    minTrackingConfidence:0.5
 
 });
 
@@ -78,60 +79,77 @@ pose.onResults((results)=>{
 if(results.poseLandmarks){
 
 
-let wrist = results.poseLandmarks[16];
+    let wrist = results.poseLandmarks[16];
+
+
+    if(wrist){
+
+
+        let movement = 0;
 
 
 
-if(wrist){
+        if(previousY !== null){
 
 
-let movement = 0;
-
-
-
-if(previousY !== null){
-
-
-movement = wrist.y - previousY;
+            movement = wrist.y - previousY;
 
 
 
-if(movement > 0.04){
+            // Bowling downward movement
+
+            if(movement > 0.04 && !cooldown){
 
 
-bowling=true;
+                status.innerHTML="💥 BALL RELEASE!";
 
-status.innerHTML="💥 Bowling Action Detected";
+
+                cooldown=true;
+
+
+                // Send signal to 3D game
+
+                if(window.releaseBall){
+
+                    window.releaseBall();
+
+                }
+
+
+
+                setTimeout(()=>{
+
+                    cooldown=false;
+
+                },1000);
+
+
+
+            }
+
+            else{
+
+
+                status.innerHTML="✋ Hand Tracking";
+
+
+            }
+
+
+
+        }
+
+
+        previousY=wrist.y;
+
+
+    }
 
 
 }
-
-else{
-
-
-status.innerHTML=
-"✋ Hand Tracking";
-
-
-}
-
-
-
-}
-
-
-
-previousY = wrist.y;
-
-
-
-}
-
-
-}
-
 
 });
+
 
 
 
@@ -156,10 +174,12 @@ requestAnimationFrame(detect);
 }
 
 
+
 detect();
 
 
 });
+
 
 
 
