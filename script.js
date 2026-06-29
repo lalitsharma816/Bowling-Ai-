@@ -12,20 +12,35 @@ async function startCamera() {
     try {
 
         const stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: "user"
+alert("JavaScript Loaded");
+
+const video = document.getElementById("video");
+const status = document.getElementById("status");
+
+let previousY = null;
+let bowling = false;
+let releaseTimer = 0;
+
+
+async function startCamera(){
+
+    try{
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video:{
+                facingMode:"user"
             },
-            audio: false
+            audio:false
         });
 
         video.srcObject = stream;
+        status.innerHTML="📷 Camera Started";
 
-        status.innerHTML = "📷 Camera Started";
-
-    } catch(error) {
+    }
+    catch(error){
 
         console.log(error);
-        status.innerHTML = "❌ Camera Error";
+        status.innerHTML="❌ Camera Error";
 
     }
 
@@ -33,17 +48,17 @@ async function startCamera() {
 
 
 const pose = new Pose({
-    locateFile: (file) => {
+    locateFile:(file)=>{
         return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
     }
 });
 
 
 pose.setOptions({
-    modelComplexity: 1,
-    smoothLandmarks: true,
-    minDetectionConfidence: 0.5,
-    minTrackingConfidence: 0.5
+    modelComplexity:1,
+    smoothLandmarks:true,
+    minDetectionConfidence:0.5,
+    minTrackingConfidence:0.5
 });
 
 
@@ -54,17 +69,7 @@ pose.onResults((results)=>{
         let wrist = results.poseLandmarks[16];
 
         if(wrist){
-if(releaseTimer > 0){
 
-    releaseTimer--;
-
-}
-
-else if(bowling){
-
-    bowling = false;
-
-}
             let movement = 0;
 
             if(previousY !== null){
@@ -73,12 +78,10 @@ else if(bowling){
 
                 if(movement > 0.04 && !bowling){
 
-    bowling = true;
-    releaseTimer = 30;
+                    bowling = true;
+                    releaseTimer = 30;
 
-    status.innerHTML = "💥 BALL RELEASE!";
-
-                }
+                    status.innerHTML="💥 BALL RELEASE!";
 
                 }
 
@@ -87,18 +90,22 @@ else if(bowling){
             previousY = wrist.y;
 
 
-            let x = Math.round(wrist.x * 100);
-            let y = Math.round(wrist.y * 100);
+            if(releaseTimer > 0){
+
+                releaseTimer--;
+
+            }
+            else{
+
+                bowling=false;
+
+            }
 
 
             if(!bowling){
 
-                if(!bowling){
-
-    status.innerHTML = 
-    "Move: " + movement.toFixed(3);
-
-}
+                status.innerHTML =
+                "Move: " + movement.toFixed(3);
 
             }
 
@@ -114,7 +121,7 @@ video.addEventListener("loadeddata",()=>{
     async function detect(){
 
         await pose.send({
-            image: video
+            image:video
         });
 
         requestAnimationFrame(detect);
@@ -127,4 +134,3 @@ video.addEventListener("loadeddata",()=>{
 
 
 startCamera();
-let releaseTimer = 0;
