@@ -54,6 +54,28 @@ pose.onResults((results)=>{
 
         if(wrist){
 let y = wrist.y;
+            if(previousY !== null){
+
+    let movement = y - previousY;
+
+    // Hand fast downward movement
+    if(movement > 0.03 && !bowling){
+
+        bowling = true;
+        status.innerHTML = "💥 Bowling Action Detected!";
+
+    }
+
+    // Reset
+    if(movement < -0.02){
+
+        bowling = false;
+
+    }
+
+}
+
+previousY = y;
             let x = Math.round(wrist.x * 100);
             let y = Math.round(wrist.y * 100);
 
