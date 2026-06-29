@@ -200,6 +200,7 @@ scene.add(stump);
 // BALL RELEASE
 
 window.releaseBall=function(){
+  alert("BALL RELEASE SIGNAL");
 
 if(!ballMoving){
 
