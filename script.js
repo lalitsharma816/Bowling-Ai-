@@ -1,130 +1,99 @@
 alert("AI System Loaded");
 
-
 const video = document.getElementById("video");
-
-
 const status = document.getElementById("status");
-
 
 
 async function startCamera(){
 
+    try{
 
-try{
+        const stream = await navigator.mediaDevices.getUserMedia({
 
+            video:{
+                facingMode:"user"
+            },
 
-const stream = await navigator.mediaDevices.getUserMedia({
+            audio:false
 
-video:{
-
-facingMode:"user"
-
-},
-
-audio:false
+        });
 
 
-});
+        video.srcObject = stream;
+
+        status.innerHTML="📷 Camera Ready";
 
 
-video.srcObject = stream;
+    }
+    catch(error){
 
+        console.log(error);
 
-status.innerHTML="📷 Camera Ready";
+        status.innerHTML="❌ Camera Error";
 
-
-}
-
-catch(error){
-
-
-console.log(error);
-
-
-status.innerHTML="❌ Camera Error";
-
+    }
 
 }
-
-
-}
-
-
-
 
 
 
 const pose = new Pose({
 
-locateFile:(file)=>{
+    locateFile:(file)=>{
 
-return 
-`https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
 
-}
+    }
 
 });
-
 
 
 
 pose.setOptions({
 
-modelComplexity:1,
+    modelComplexity:1,
 
-smoothLandmarks:true,
+    smoothLandmarks:true,
 
-minDetectionConfidence:0.6,
+    minDetectionConfidence:0.6,
 
-minTrackingConfidence:0.6
+    minTrackingConfidence:0.6
 
 });
-
-
 
 
 
 pose.onResults((results)=>{
 
-
-analyzeBowling(results);
-
+    analyzeBowling(results);
 
 });
-
-
-
-
 
 
 
 video.addEventListener("loadeddata",()=>{
 
 
-async function detect(){
+    async function detect(){
 
 
-await pose.send({
+        await pose.send({
 
-image:video
+            image:video
+
+        });
+
+
+        requestAnimationFrame(detect);
+
+
+    }
+
+
+    detect();
+
 
 });
-
-
-requestAnimationFrame(detect);
-
-
-}
-
-
-detect();
-
-
-});
-
-
-
 
 
 
