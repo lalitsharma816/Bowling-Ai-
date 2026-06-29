@@ -1,3 +1,4 @@
+alert("AI FILE RUNNING");
 let lastWristY = null;
 let releaseLock = false;
 
