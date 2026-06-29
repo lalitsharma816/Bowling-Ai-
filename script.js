@@ -1,13 +1,7 @@
-alert("JavaScript Loaded");
 const video = document.getElementById("video");
 const status = document.getElementById("status");
 
 async function startCamera() {
-
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        status.innerHTML = "❌ Camera Not Supported";
-        return;
-    }
 
     try {
 
@@ -20,44 +14,77 @@ async function startCamera() {
 
         video.srcObject = stream;
 
-        status.innerHTML = "✅ Camera Started";
+        status.innerHTML = "📷 Camera Started";
 
-    } catch (error) {
+    } catch(error) {
 
+        status.innerHTML = "❌ Camera Error";
         console.log(error);
 
-        status.innerHTML = "❌ Camera Permission Denied";
-
     }
-
 }
 
-startCamera();
+
 const pose = new Pose({
     locateFile: (file) => {
         return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
     }
 });
 
+
 pose.setOptions({
+
     modelComplexity: 1,
     smoothLandmarks: true,
+    enableSegmentation: false,
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5
+
 });
 
-pose.onResults((results) => {
-    if (results.poseLandmarks) {
-        status.innerHTML =  "🏏 Right Hand Tracking...";
-    } else {
-        status.innerHTML = "👤 Stand in Front of Camera";
+
+pose.onResults((results)=>{
+
+    if(results.poseLandmarks){
+
+        // Right wrist landmark = 16
+        let wrist = results.poseLandmarks[16];
+
+        if(wrist){
+
+            let x = Math.round(wrist.x * 100);
+            let y = Math.round(wrist.y * 100);
+
+            status.innerHTML =
+            "🏏 Right Wrist: X=" + x + " Y=" + y;
+
+        }
+
     }
+    else{
+
+        status.innerHTML="👤 Stand in Camera";
+
+    }
+
 });
 
-video.addEventListener("loadeddata", async () => {
-    async function detect() {
-        await pose.send({ image: video });
+
+video.addEventListener("loadeddata",()=>{
+
+    async function detect(){
+
+        await pose.send({
+            image: video
+        });
+
         requestAnimationFrame(detect);
+
     }
+
     detect();
+
 });
+
+
+startCamera();
