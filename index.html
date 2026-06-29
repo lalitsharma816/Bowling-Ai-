@@ -36,11 +36,9 @@ Waiting for Camera...
 <div id="score">
 
 Runs: <span id="runs">0</span>
-
 <br>
 
 Wickets: <span id="wickets">0</span>
-
 <br>
 
 Balls: <span id="balls">0</span>/6
@@ -70,19 +68,45 @@ Restart
 
 
 
-<!-- AI -->
+
+<!-- AI Files -->
 
 <script src="ai.js"></script>
 
+<script src="script.js"></script>
 
 
-<!-- Game -->
+
+
+
+<!-- Three JS Game -->
+
+<script type="importmap">
+
+{
+
+"imports":
+
+{
+
+"three":
+
+"https://unpkg.com/three@0.165.0/build/three.module.js"
+
+}
+
+}
+
+</script>
+
 
 <script type="module" src="game.js"></script>
 
 
 
-<!-- Score -->
+
+
+<!-- Score System -->
 
 <script src="score.js"></script>
 
