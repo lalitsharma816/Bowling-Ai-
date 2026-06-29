@@ -201,6 +201,22 @@ scene.add(stump);
 
 window.releaseBall=function(){
 
+if(!ballMoving){
+
+ball.position.set(0,1,5);
+
+velocityY=0;
+
+ballMoving=true;
+
+
+if(window.addBall){
+    addBall();
+}
+
+}
+
+};
 console.log("GAME RECEIVED RELEASE");
 
 
