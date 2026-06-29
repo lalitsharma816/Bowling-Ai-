@@ -1,99 +1,107 @@
 let lastWristY = null;
+let lastElbowY = null;
+
 let releaseLock = false;
 
 
 function analyzeBowling(results){
 
 
-if(!results.poseLandmarks){
-
-return;
-
-}
+    if(!results.poseLandmarks){
+        return;
+    }
 
 
-
-let wrist = results.poseLandmarks[16];
-
-let elbow = results.poseLandmarks[14];
-
+    let wrist = results.poseLandmarks[16];
+    let elbow = results.poseLandmarks[14];
+    let shoulder = results.poseLandmarks[12];
 
 
-if(!wrist || !elbow){
-
-return;
-
-}
+    if(!wrist || !elbow || !shoulder){
+        return;
+    }
 
 
 
-let movement = 0;
+    let wristMove = 0;
+    let elbowMove = 0;
 
 
 
-if(lastWristY !== null){
+    if(lastWristY !== null){
 
-movement = wrist.y - lastWristY;
+        wristMove = wrist.y - lastWristY;
 
-
-}
-
+    }
 
 
-// Bowling condition
+    if(lastElbowY !== null){
 
-if(
+        elbowMove = elbow.y - lastElbowY;
 
-movement > 0.07 &&
-
-wrist.y > elbow.y &&
-
-!releaseLock
-
-){
-
-
-releaseLock = true;
-
-
-document.getElementById("status").innerHTML =
-"🔥 BALL RELEASE";
+    }
 
 
 
-// Send signal to game
 
-if(window.releaseBall){
+    /*
+       Strict Bowling Condition
 
-window.releaseBall();
-
-}
-
-
-
-setTimeout(()=>{
-
-releaseLock=false;
-
-},1200);
+       1. Wrist fast down
+       2. Elbow also moving
+       3. Wrist below elbow
+    */
 
 
+    if(
 
-}
+        wristMove > 0.12 &&
 
-else{
+        elbowMove > 0.04 &&
 
+        wrist.y > elbow.y &&
 
-document.getElementById("status").innerHTML =
-"✋ Tracking Hand";
+        !releaseLock
 
-
-}
-
+    ){
 
 
-lastWristY = wrist.y;
+        releaseLock = true;
 
+
+        document.getElementById("status").innerHTML =
+        "🔥 REAL BALL RELEASE";
+
+
+
+        if(window.releaseBall){
+
+            window.releaseBall();
+
+        }
+
+
+
+        setTimeout(()=>{
+
+            releaseLock=false;
+
+        },2000);
+
+
+    }
+
+    else{
+
+        document.getElementById("status").innerHTML =
+        "✋ Waiting Bowling";
+
+    }
+
+
+
+    lastWristY = wrist.y;
+    lastElbowY = elbow.y;
 
 
 }
