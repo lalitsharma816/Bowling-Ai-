@@ -11,7 +11,7 @@ const camera = new THREE.PerspectiveCamera(
 
 75,
 
-window.innerWidth/400,
+window.innerWidth / 400,
 
 0.1,
 
@@ -83,6 +83,7 @@ scene.add(pitch);
 
 
 
+
 // Ball
 
 const ball = new THREE.Mesh(
@@ -106,19 +107,67 @@ scene.add(ball);
 
 
 
+
+
+let ballMoving=false;
+
+
+
+
+
+// Ball movement after release
+
 function moveBall(){
 
-ball.position.z-=0.08;
+
+if(ballMoving){
 
 
-if(ball.position.z<-7){
+ball.position.z-=0.18;
+
+
+
+if(ball.position.z < -7){
+
 
 ball.position.z=5;
 
+
+ballMoving=false;
+
+
+}
+
+
+
 }
 
 
 }
+
+
+
+
+
+
+// AI se ball release
+
+window.releaseBall=function(){
+
+
+if(!ballMoving){
+
+
+ballMoving=true;
+
+
+ball.position.z=5;
+
+
+}
+
+
+};
 
 
 
@@ -159,6 +208,10 @@ scene.add(stump);
 
 
 
+
+// Lights
+
+
 const light=new THREE.DirectionalLight(
 
 0xffffff,
@@ -170,10 +223,17 @@ const light=new THREE.DirectionalLight(
 
 light.position.set(5,10,5);
 
+
 scene.add(light);
 
 
-scene.add(new THREE.AmbientLight(0xffffff,0.5));
+scene.add(
+
+new THREE.AmbientLight(0xffffff,0.5)
+
+);
+
+
 
 
 
@@ -183,6 +243,8 @@ camera.position.set(0,5,12);
 
 
 camera.lookAt(0,0,-5);
+
+
 
 
 
