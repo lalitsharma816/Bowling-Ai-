@@ -1,4 +1,5 @@
 alert("AI System Loaded");
+alert("SCRIPT RUNNING");
 
 const video = document.getElementById("video");
 const status = document.getElementById("status");
