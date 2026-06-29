@@ -78,9 +78,10 @@ let y = wrist.y;
 previousY = y;
             let x = Math.round(wrist.x * 100);
             let y = Math.round(wrist.y * 100);
-
+let previousY = null;
+let movement = 0;
             status.innerHTML =
-            "🏏 Right Wrist: X=" + x + " Y=" + y;
+            "🏏 Right Wrist:"X=" + x + " Y=" + y + " Move=" + movement;
 
         }
 
