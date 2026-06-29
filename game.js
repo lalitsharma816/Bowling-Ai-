@@ -40,9 +40,11 @@ color:0x228b22
 
 );
 
-ground.rotation.x=-Math.PI/2;
+
+ground.rotation.x = -Math.PI/2;
 
 scene.add(ground);
+
 
 
 
@@ -58,6 +60,7 @@ color:0xd2b48c
 })
 
 );
+
 
 pitch.position.y=0.03;
 
@@ -98,6 +101,7 @@ let startTime=0;
 
 
 
+
 // Wickets
 
 const stumps=[];
@@ -122,7 +126,6 @@ stump.position.set(i,0.5,-7);
 
 scene.add(stump);
 
-
 stumps.push(stump);
 
 
@@ -132,7 +135,8 @@ stumps.push(stump);
 
 
 
-// Ball release
+
+// AI se ball release
 
 window.releaseBall=function(){
 
@@ -149,12 +153,14 @@ startTime=Date.now();
 
 }
 
-
 };
 
 
 
 
+
+
+// Wicket check
 
 function checkWicket(){
 
@@ -167,7 +173,7 @@ ball.position.distanceTo(stump.position);
 
 
 
-if(distance < 0.3){
+if(distance < 0.35){
 
 
 ballMoving=false;
@@ -177,7 +183,7 @@ document.getElementById("status").innerHTML =
 "🏏 OUT! WICKET HIT";
 
 
-return;
+return true;
 
 
 }
@@ -186,6 +192,9 @@ return;
 }
 
 
+return false;
+
+
 }
 
 
@@ -193,6 +202,8 @@ return;
 
 
 
+
+// Ball movement
 
 function moveBall(){
 
@@ -203,7 +214,13 @@ if(ballMoving){
 ball.position.z -= speed;
 
 
-checkWicket();
+
+if(checkWicket()){
+
+return;
+
+}
+
 
 
 
@@ -221,6 +238,7 @@ document.getElementById("status").innerHTML =
 "⚡ Speed: "+ballSpeed+" m/s";
 
 
+
 ball.position.z=5;
 
 ballMoving=false;
@@ -229,24 +247,29 @@ ballMoving=false;
 }
 
 
-}
-
 
 }
 
 
+}
 
 
 
 
-// Light
+
+
+
+
+// Lights
 
 const light=new THREE.DirectionalLight(
 0xffffff,
 1
 );
 
+
 light.position.set(5,10,5);
+
 
 scene.add(light);
 
@@ -260,7 +283,9 @@ new THREE.AmbientLight(0xffffff,0.5)
 
 
 
+
 camera.position.set(0,5,12);
+
 
 camera.lookAt(0,0,-5);
 
