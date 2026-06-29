@@ -48,7 +48,7 @@ pose.setOptions({
 
 pose.onResults((results) => {
     if (results.poseLandmarks) {
-        status.innerHTML = "🏏 Bowler Detected";
+        status.innerHTML =  "🏏 Right Hand Tracking...";
     } else {
         status.innerHTML = "👤 Stand in Front of Camera";
     }
