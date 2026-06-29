@@ -212,6 +212,8 @@ if(ballMoving){
 
 
 ball.position.z -= speed;
+  document.getElementById("status").innerHTML =
+"Ball Z = " + ball.position.z.toFixed(2);
 
 
 
