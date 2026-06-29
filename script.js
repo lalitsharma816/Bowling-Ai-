@@ -93,7 +93,12 @@ else if(bowling){
 
             if(!bowling){
 
-                status.innerHTML = "🟢 AI Body Detected";
+                if(!bowling){
+
+    status.innerHTML = 
+    "Move: " + movement.toFixed(3);
+
+}
 
             }
 
