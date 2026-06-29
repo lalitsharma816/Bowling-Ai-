@@ -1,6 +1,6 @@
-alert("AI FILE RUNNING");
 let lastWristY = null;
 let releaseLock = false;
+let frameCount = 0;
 
 
 function analyzeBowling(results){
@@ -11,16 +11,16 @@ function analyzeBowling(results){
 
 
     let wrist = results.poseLandmarks[16];
+    let elbow = results.poseLandmarks[14];
 
 
-    if(!wrist){
+    if(!wrist || !elbow){
         return;
     }
 
 
 
     let movement = 0;
-
 
 
     if(lastWristY !== null){
@@ -30,22 +30,34 @@ function analyzeBowling(results){
     }
 
 
-
     lastWristY = wrist.y;
 
 
 
-    // Debug
+    // small movement ignore
 
-    document.getElementById("status").innerHTML =
-    "Movement: " + movement.toFixed(3);
+    if(Math.abs(movement) < 0.03){
+
+        document.getElementById("status").innerHTML =
+        "Waiting Bowling";
+
+        return;
+
+    }
 
 
 
+
+    // real bowling action
 
     if(
-        movement > 0.05 &&
+
+        movement > 0.10 &&
+
+        wrist.y > elbow.y &&
+
         !releaseLock
+
     ){
 
 
@@ -53,7 +65,7 @@ function analyzeBowling(results){
 
 
         document.getElementById("status").innerHTML =
-        "🔥 BALL RELEASE";
+        "🔥 DELIVERY RELEASE";
 
 
 
@@ -69,8 +81,7 @@ function analyzeBowling(results){
 
             releaseLock=false;
 
-        },1500);
-
+        },3000);
 
 
     }
