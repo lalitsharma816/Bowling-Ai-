@@ -1,107 +1,117 @@
 let lastWristY = null;
-let lastElbowY = null;
-
 let releaseLock = false;
+
+let stableFrames = 0;
 
 
 function analyzeBowling(results){
 
 
-    if(!results.poseLandmarks){
-        return;
-    }
-
-
-    let wrist = results.poseLandmarks[16];
-    let elbow = results.poseLandmarks[14];
-    let shoulder = results.poseLandmarks[12];
-
-
-    if(!wrist || !elbow || !shoulder){
-        return;
-    }
+if(!results.poseLandmarks){
+    return;
+}
 
 
 
-    let wristMove = 0;
-    let elbowMove = 0;
+let wrist = results.poseLandmarks[16];
+let elbow = results.poseLandmarks[14];
+let shoulder = results.poseLandmarks[12];
 
 
 
-    if(lastWristY !== null){
-
-        wristMove = wrist.y - lastWristY;
-
-    }
-
-
-    if(lastElbowY !== null){
-
-        elbowMove = elbow.y - lastElbowY;
-
-    }
+if(!wrist || !elbow || !shoulder){
+    return;
+}
 
 
 
 
-    /*
-       Strict Bowling Condition
-
-       1. Wrist fast down
-       2. Elbow also moving
-       3. Wrist below elbow
-    */
+let movement = 0;
 
 
-    if(
+if(lastWristY !== null){
 
-        wristMove > 0.12 &&
+    movement = wrist.y - lastWristY;
 
-        elbowMove > 0.04 &&
-
-        wrist.y > elbow.y &&
-
-        !releaseLock
-
-    ){
+}
 
 
-        releaseLock = true;
-
-
-        document.getElementById("status").innerHTML =
-        "🔥 REAL BALL RELEASE";
+lastWristY = wrist.y;
 
 
 
-        if(window.releaseBall){
+// Debug
 
-            window.releaseBall();
-
-        }
-
-
-
-        setTimeout(()=>{
-
-            releaseLock=false;
-
-        },2000);
-
-
-    }
-
-    else{
-
-        document.getElementById("status").innerHTML =
-        "✋ Waiting Bowling";
-
-    }
+document.getElementById("status").innerHTML =
+"Wrist move: " + movement.toFixed(3);
 
 
 
-    lastWristY = wrist.y;
-    lastElbowY = elbow.y;
+
+// Very strict release
+
+if(
+
+movement > 0.18 &&
+
+wrist.y > elbow.y &&
+
+elbow.y > shoulder.y &&
+
+!releaseLock
+
+){
+
+
+stableFrames++;
+
+
+}
+
+else{
+
+
+stableFrames = 0;
+
+
+}
+
+
+
+
+
+// 3 frames same condition required
+
+if(stableFrames >= 3){
+
+
+releaseLock=true;
+
+
+document.getElementById("status").innerHTML =
+"🔥 BALL RELEASE";
+
+
+
+if(window.releaseBall){
+
+window.releaseBall();
+
+}
+
+
+
+setTimeout(()=>{
+
+releaseLock=false;
+
+stableFrames=0;
+
+},2500);
+
+
+
+}
 
 
 }
