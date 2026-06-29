@@ -33,7 +33,28 @@ const pitch = new THREE.Mesh(
 
 pitch.position.y = 0.03;
 scene.add(pitch);
+// Cricket Ball
+const ball = new THREE.Mesh(
+    new THREE.SphereGeometry(0.15,32,32),
+    new THREE.MeshPhongMaterial({color:0x8b0000})
+);
 
+ball.position.set(0,1,5);
+scene.add(ball);
+
+
+// Ball movement test
+let ballSpeed = 0.08;
+
+function moveBall(){
+
+    ball.position.z -= ballSpeed;
+
+    if(ball.position.z < -7){
+        ball.position.z = 5;
+    }
+
+}
 // Wickets
 const material = new THREE.MeshPhongMaterial({color:0xffffff});
 
