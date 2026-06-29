@@ -1,8 +1,10 @@
 const video = document.getElementById("video");
 const status = document.getElementById("status");
+
 let previousY = null;
 let bowling = false;
-let release = false;
+
+
 async function startCamera() {
 
     try {
@@ -20,10 +22,11 @@ async function startCamera() {
 
     } catch(error) {
 
-        status.innerHTML = "❌ Camera Error";
         console.log(error);
+        status.innerHTML = "❌ Camera Error";
 
     }
+
 }
 
 
@@ -35,13 +38,10 @@ const pose = new Pose({
 
 
 pose.setOptions({
-
     modelComplexity: 1,
     smoothLandmarks: true,
-    enableSegmentation: false,
     minDetectionConfidence: 0.5,
     minTrackingConfidence: 0.5
-
 });
 
 
@@ -49,46 +49,42 @@ pose.onResults((results)=>{
 
     if(results.poseLandmarks){
 
-        // Right wrist landmark = 16
         let wrist = results.poseLandmarks[16];
 
         if(wrist){
-let y = wrist.y;
+
+            let movement = 0;
+
             if(previousY !== null){
 
-    let movement = y - previousY;
+                movement = wrist.y - previousY;
 
-    // Hand fast downward movement
-    if(movement > 0.03 && !bowling){
+                if(movement > 0.03 && !bowling){
 
-        bowling = true;
-        status.innerHTML = "💥 Bowling Action Detected!";
+                    bowling = true;
+                    status.innerHTML = "💥 Bowling Action Detected!";
 
-    }
+                }
 
-    // Reset
-    if(movement < -0.02){
+            }
 
-        bowling = false;
+            previousY = wrist.y;
 
-    }
 
-}
-
-previousY = y;
             let x = Math.round(wrist.x * 100);
             let y = Math.round(wrist.y * 100);
-let previousY = null;
-let movement = 0;
-            status.innerHTML =
-            "🏏 Right Wrist:"X=" + x + " Y=" + y + " Move=" + movement;
+
+
+            if(!bowling){
+
+                status.innerHTML =
+                "🏏 Right Wrist X=" + x +
+                " Y=" + y +
+                " Move=" + movement.toFixed(3);
+
+            }
 
         }
-
-    }
-    else{
-
-        status.innerHTML="👤 Stand in Camera";
 
     }
 
