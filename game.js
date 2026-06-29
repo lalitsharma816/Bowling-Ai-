@@ -200,9 +200,9 @@ scene.add(stump);
 // BALL RELEASE
 
 window.releaseBall=function(){
-  alert("BALL RELEASE SIGNAL");
 
-if(!ballMoving){
+console.log("GAME RECEIVED RELEASE");
+
 
 ball.position.set(0,1,5);
 
@@ -210,7 +210,10 @@ velocityY=0;
 
 ballMoving=true;
 
-}
+
+document.getElementById("status").innerHTML =
+"🏏 BALL THROWN";
+
 
 };
 
