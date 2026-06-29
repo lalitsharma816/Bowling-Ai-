@@ -1,32 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Bowling AI</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
+
+
 <body>
 
-<h1>🏏 Bowling AI</h1>
+<h1>🏏 Bowling AI 3D</h1>
+
 
 <video id="video" autoplay playsinline muted></video>
-<canvas id="output"></canvas>
-<canvas id="canvas"></canvas>
+
 
 <h2 id="status">Waiting for Camera...</h2>
+
+
+<!-- MediaPipe -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+
+
+<!-- AI -->
 <script src="script.js"></script>
+
+
+<!-- Three JS -->
+
 <script type="importmap">
 {
-  "imports": {
-    "three": "https://unpkg.com/three@0.165.0/build/three.module.js"
-  }
+ "imports":
+ {
+  "three":"https://unpkg.com/three@0.165.0/build/three.module.js"
+ }
 }
 </script>
 
+
 <script type="module" src="game.js"></script>
+
+
 </body>
+
 </html>
