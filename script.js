@@ -1,4 +1,5 @@
 alert("JavaScript Loaded");
+let bowling = false;
 const video = document.getElementById("video");
 const status = document.getElementById("status");
 
@@ -53,17 +54,31 @@ pose.onResults((results)=>{
         let wrist = results.poseLandmarks[16];
 
         if(wrist){
+if(releaseTimer > 0){
 
+    releaseTimer--;
+
+}
+
+else if(bowling){
+
+    bowling = false;
+
+}
             let movement = 0;
 
             if(previousY !== null){
 
                 movement = wrist.y - previousY;
 
-                if(movement > 0.03 && !bowling){
+                if(movement > 0.04 && !bowling){
 
-                    bowling = true;
-                    status.innerHTML = "💥 Bowling Action Detected!";
+    bowling = true;
+    releaseTimer = 30;
+
+    status.innerHTML = "💥 BALL RELEASE!";
+
+                }
 
                 }
 
@@ -107,3 +122,4 @@ video.addEventListener("loadeddata",()=>{
 
 
 startCamera();
+let releaseTimer = 0;
